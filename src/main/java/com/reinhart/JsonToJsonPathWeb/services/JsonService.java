@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -57,15 +58,28 @@ public class JsonService {
 
 		List<String> allPaths = JsonPath.using(conf).parse(json).read(params);
 
+		List<String> dotNotationPath = new ArrayList<String>();
 		allPaths.forEach((temp) -> {
 			String jsonpath = temp;
+			String DotNotation1 = jsonpath.replace("['", ".").replace("']", ".").replace("]", "].").replace("..", ".");
+			;
+
+			char tocheck = DotNotation1.charAt(DotNotation1.length() - 1);
+			StringBuffer DotNotationFinal = new StringBuffer(DotNotation1);
+			if (tocheck == '.') {
+
+				DotNotationFinal.deleteCharAt(DotNotation1.length() - 1);
+			}
 
 			Object dataObject = JsonPath.parse(jsonData).read(jsonpath);
 			String value = dataObject.toString();
-			log.info("JsonPath : " + jsonpath + "  " + "Value : " + value);
+
+			log.info("JsonPath : " + jsonpath + " " + "Dot Notation : " + DotNotationFinal.toString());
+
+			dotNotationPath.add(DotNotationFinal.toString());
 		});
 
-		return allPaths;
+		return dotNotationPath;
 
 	}
 
@@ -92,6 +106,8 @@ public class JsonService {
 			String jsonpath = temp;
 			Object dataObject = JsonPath.parse(JsonData).read(jsonpath);
 			String value = dataObject.toString();
+
+			log.info("JsonPath : " + jsonpath + "  " + "Value : " + value);
 
 			builder.append("<tr>");
 			builder.append("<th>" + jsonpath + "</th>");
