@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.util.ResourceUtils;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
+import com.opencsv.CSVWriter;
 
 @Service
 public class JsonService {
@@ -40,14 +42,35 @@ public class JsonService {
 			return jsonContent;
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			log.error(e.toString());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			log.error(e.toString());
 		}
 		return null;
 
+	}
+
+	public List<String[]> CombineJsonPathandData(String json, List<String> jsonpath) {
+
+		List<String[]> data = new ArrayList<>();
+		data.add(new String[] { "JsonPath Dot Notation", "Value" });
+
+		jsonpath.forEach((temp) -> {
+			Object dataObject = JsonPath.parse(json).read(temp);
+			String value = dataObject.toString();
+			data.add(new String[] { temp, value });
+		});
+
+		return data;
+	}
+
+	public void saveToCsv(List<String[]> datatoprocess) {
+		try (CSVWriter writer = new CSVWriter(new FileWriter("C:\\Dev.Acn\\CSV\\test.csv"))) {
+			writer.writeAll(datatoprocess);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			log.error(e.toString());
+		}
 	}
 
 	public List<String> ShowJsonPath(String json, String params) {
@@ -71,8 +94,8 @@ public class JsonService {
 				DotNotationFinal.deleteCharAt(DotNotation1.length() - 1);
 			}
 
-			Object dataObject = JsonPath.parse(jsonData).read(jsonpath);
-			String value = dataObject.toString();
+			// Object dataObject = JsonPath.parse(jsonData).read(jsonpath);
+			// String value = dataObject.toString();
 
 			log.info("JsonPath : " + jsonpath + " " + "Dot Notation : " + DotNotationFinal.toString());
 

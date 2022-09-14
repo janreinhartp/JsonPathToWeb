@@ -25,7 +25,13 @@ public class JsonController {
 		String parameter = "$[" + path + "]..*";
 		String JsonData = service.readJsonFile();
 		return service.htmlBuilder(service.ShowJsonPath(JsonData, parameter), JsonData);
+	}
 
+	@GetMapping("/tocsv")
+	public void showJsonPathAndValueAndWriteCsv(@RequestParam String path) {
+		String parameter = "$[" + path + "]..*";
+		String JsonData = service.readJsonFile();
+		service.saveToCsv(service.CombineJsonPathandData(JsonData, service.ShowJsonPath(JsonData, parameter)));
 	}
 
 }
